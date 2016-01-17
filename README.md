@@ -2,6 +2,8 @@
 
 Layout is a package to automate the layout of objects in world space.
 
+![Example gif](https://raw.github.com/shadowmint/unity-n-layout/master/media/demo.gif)
+
 ## Usage
 
     using UnityEngine;

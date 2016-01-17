@@ -53,14 +53,14 @@ namespace N.Package.Layout.Layouts
                 var angle = offset * step;
                 var pos_x = Mathf.Cos(base_arc + angle) * length * left;
                 var pos_y = Mathf.Sin(base_arc + angle) * length * up;
-                var new_normal = (origin + (pos_x + pos_y)).normalized;
-                var pos = this.origin + pos_x + pos_y;
+                var new_normal = (pos_x + pos_y).normalized;
+                var pos = this.origin + pos_x + pos_y + normal * verticalIncrement * offset;
                 offset += 1;
                 yield return new LayoutObject
                 {
                     gameObject = gp,
                     rotation = Quaternion.LookRotation(new_normal, normal),
-                    position = pos + normal * verticalIncrement * offset
+                    position = pos
                 };
             }
         }

@@ -1,4 +1,5 @@
 using UnityEngine;
+using N;
 using N.Package.Layout;
 using N.Package.Layout.Layouts;
 using N.Package.Animation;
@@ -77,24 +78,28 @@ public class LayoutSequenceDemo : MonoBehaviour
 
     public void RunLayoutOne()
     {
-        var layout = new LinearPlanarSpread(target1);
+        _.Log("Layout one");
+        var layout = new UniformPlanarFold(target3, 30f, 4f);
         LayoutManager.Default.Add(Streams.STREAM_0, layout, factory, new TargetByComponent<DemoMarker>());
     }
 
     public void RunLayoutTwo()
     {
-        var layout = new LinearPlanarSpread(target2);
+        _.Log("Layout two");
+        var layout = new LinearPlanarSpread(target1);
         LayoutManager.Default.Add(Streams.STREAM_0, layout, factory, new TargetByComponent<DemoMarker>());
     }
 
     public void RunLayoutThree()
     {
-        var layout = new LinearPlanarSpread(target3);
+        _.Log("Layout three");
+        var layout = new UniformPlanarSpread(target2);
         LayoutManager.Default.Add(Streams.STREAM_0, layout, factory, new TargetByComponent<DemoMarker>());
     }
 
     public void RunLayoutFour()
     {
+        _.Log("Layout four");
         var layout = new LinearPlanarSpread(target4);
         LayoutManager.Default.Add(Streams.STREAM_0, layout, factory, new TargetByComponent<DemoMarker>());
     }
