@@ -42,13 +42,8 @@ public class LinearPlanarSpreadTests : N.Tests.Test
         Assert(AnimationManager.Default.Streams.Active(Streams.STREAM_0));
 
         int count = 0;
-        AnimationManager.Default.AddEventListener((evp) =>
-        {
-            evp.As<LayoutCompleteEvent>().Then((ep) =>
-            {
-                count += 1;
-            });
-        });
+        AnimationManager.Default.Events.AddEventHandler<LayoutCompleteEvent>((ep) =>
+        { count += 1; });
 
         var timer = AnimationHandler.Default.timer;
         timer.Force(0.5f);

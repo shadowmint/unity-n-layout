@@ -26,24 +26,21 @@ public class LayoutSequenceDemo : MonoBehaviour
     public void Start()
     {
         factory = (LayoutObject target) =>
-         {
+        {
              var animation = new MoveSingle(target.position, target.rotation);
              animation.AnimationCurve = new Linear(duration);
              animation.AnimationTarget = new TargetSingle(target.gameObject);
              return animation;
-         };
+        };
 
-        AnimationManager.Default.AddEventListener((evp) =>
+        AnimationManager.Default.Events.AddEventHandler<LayoutCompleteEvent>((ep) =>
         {
-            evp.As<LayoutCompleteEvent>().Then((ep) =>
+            offset += 1;
+            if (offset >= 4)
             {
-                offset += 1;
-                if (offset >= 4)
-                {
-                    offset = 0;
-                }
-                idle = true;
-            });
+                offset = 0;
+            }
+            idle = true;
         });
 
         AnimationManager.Default.Configure(Streams.STREAM_0, AnimationStreamType.DEFER, 16);

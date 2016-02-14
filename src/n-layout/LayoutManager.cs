@@ -19,19 +19,17 @@ namespace N.Package.Layout
         public LayoutManagerBase(AnimationManagerBase<TStream> manager)
         {
             this.manager = manager;
-            this.manager.AddEventListener((evp) =>
+            this.manager.Events.AddEventHandler<AnimationCompleteEvent>((ep) =>
             {
-                evp.As<AnimationCompleteEvent>().Then((ep) =>
+                foreach (var p in pending)
                 {
-                    foreach (var p in pending)
+                    if (p.Resolve(ep.animation))
                     {
-                        if (p.Resolve(ep.animation)) {
-                            var layout_event = new LayoutCompleteEvent { layout = p.layout };
-                            manager.Events.Trigger(layout_event);
-                        }
+                        var layout_event = new LayoutCompleteEvent { layout = p.layout };
+                        manager.Events.Trigger(layout_event);
                     }
-                    pending.RemoveAll((p) => p.Pending == 0);
-                });
+                }
+                pending.RemoveAll((p) => p.Pending == 0);
             });
         }
 

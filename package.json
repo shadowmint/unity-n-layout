@@ -1,6 +1,6 @@
 {
   "name": "unity-n-layout",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "A worldspace layout management package",
   "main": "index.js",
   "repository": {
@@ -24,6 +24,6 @@
   "dependencies": {
     "mkdirp": "^0.5.1",
     "ncp": "^2.0.0",
-    "unity-n-animation": "github:shadowmint/unity-n-animation#0.0.1"
+    "unity-n-animation": "github:shadowmint/unity-n-animation#0.0.2"
   }
 }
