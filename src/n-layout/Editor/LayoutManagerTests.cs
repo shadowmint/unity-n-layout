@@ -4,23 +4,25 @@ using N.Package.Animation;
 using N.Package.Layout;
 using UnityEngine;
 using N;
+using N.Package.Core;
+using N.Package.Core.Tests;
 
-public class LayoutManagerTests : N.Tests.Test
+public class LayoutManagerTests : TestCase
 {
-    public static void Reset(N.Tests.Test test)
-    {
-        test.TearDown();
-        LayoutManager.Reset();
-        AnimationHandler.Reset();
-    }
+  public static void Reset(TestCase test)
+  {
+    test.TearDown();
+    LayoutManager.Reset();
+    AnimationHandler.Reset();
+  }
 
-    [Test]
-    public void test_get_default_instances()
-    {
-        LayoutManagerTests.Reset(this);
-        var instance = LayoutManager.Default;
-        Assert(instance != null);
-        LayoutManagerTests.Reset(this);
-    }
+  [Test]
+  public void test_get_default_instances()
+  {
+    LayoutManagerTests.Reset(this);
+    var instance = LayoutManager.Default;
+    Assert(instance != null);
+    LayoutManagerTests.Reset(this);
+  }
 }
 #endif

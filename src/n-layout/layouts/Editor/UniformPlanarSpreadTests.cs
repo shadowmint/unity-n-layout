@@ -8,57 +8,55 @@ using N.Package.Animation;
 using N.Package.Animation.Animations;
 using N.Package.Animation.Curves;
 using N.Package.Animation.Targets;
+using N.Package.Core;
+using N.Package.Core.Tests;
 
-public class UniformPlanarSpreadTests : N.Tests.Test
+public class UniformPlanarSpreadTests : TestCase
 {
-    [Test]
-    public void test_layout()
+  [Test]
+  public void test_layout()
+  {
+    LayoutManagerTests.Reset(this);
+
+    AnimationManager.Default.Configure(Streams.STREAM_0, AnimationStreamType.DEFER, 30);
+
+    var layout = new UniformPlanarSpread(new Vector3(0, 0, 0), new Vector3(0, 1, 0), new Vector3(0, 0, 1), 10f, 10f);
+
+    LayoutFactoryDelegate factory = (LayoutObject target) =>
     {
-        LayoutManagerTests.Reset(this);
+      var animation = new MoveSingle(target.position, target.rotation);
+      animation.AnimationCurve = new Linear(1f);
+      animation.AnimationTarget = new TargetSingle(target.gameObject);
+      return animation;
+    };
 
-        AnimationManager.Default.Configure(Streams.STREAM_0, AnimationStreamType.DEFER, 30);
+    var targets = new GameObject[]
+    {
+      this.SpawnBlank(),
+      this.SpawnBlank(),
+      this.SpawnBlank(),
+      this.SpawnBlank(),
+      this.SpawnBlank(),
+      this.SpawnBlank(),
+    };
 
-        var layout = new UniformPlanarSpread(new Vector3(0,0,0), new Vector3(0,1,0), new Vector3(0,0,1), 10f, 10f);
+    LayoutManager.Default.Add(Streams.STREAM_0, layout, factory, new TargetGroup(targets));
 
-        LayoutFactoryDelegate factory = (LayoutObject target) =>
-        {
-            var animation = new MoveSingle(target.position, target.rotation);
-            animation.AnimationCurve = new Linear(1f);
-            animation.AnimationTarget = new TargetSingle(target.gameObject);
-            return animation;
-        };
+    Assert(AnimationManager.Default.Streams.Active(Streams.STREAM_0));
 
-        var targets = new GameObject[] {
-            this.SpawnBlank(),
-            this.SpawnBlank(),
-            this.SpawnBlank(),
-            this.SpawnBlank(),
-            this.SpawnBlank(),
-            this.SpawnBlank(),
-        };
+    int count = 0;
+    AnimationManager.Default.Events.AddEventHandler<AnimationCompleteEvent>((evp) => { count += 1; });
 
-        LayoutManager.Default.Add(Streams.STREAM_0, layout, factory, new TargetGroup(targets));
+    AnimationHandler.Default.Update(0.5f);
 
-        Assert(AnimationManager.Default.Streams.Active(Streams.STREAM_0));
+    Assert(AnimationManager.Default.Streams.Active(Streams.STREAM_0));
 
-        int count = 0;
-        AnimationManager.Default.Events.AddEventHandler<AnimationCompleteEvent>((evp) => { count += 1; });
+    AnimationHandler.Default.Update(0.5f);
+    AnimationHandler.Default.Update(0.5f);
 
-        var timer = AnimationHandler.Default.timer;
-        timer.Force(0.5f);
-        timer.Step();
+    Assert(!AnimationManager.Default.Streams.Active(Streams.STREAM_0));
 
-        Assert(AnimationManager.Default.Streams.Active(Streams.STREAM_0));
-
-        timer.Force(0.5f);
-        timer.Step();
-
-        timer.Force(0.5f);
-        timer.Step();
-
-        Assert(!AnimationManager.Default.Streams.Active(Streams.STREAM_0));
-
-        LayoutManagerTests.Reset(this);
-    }
+    LayoutManagerTests.Reset(this);
+  }
 }
 #endif

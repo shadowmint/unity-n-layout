@@ -25,7 +25,7 @@ namespace N.Package.Layout
                 {
                     if (p.Resolve(ep.animation))
                     {
-                        var layout_event = new LayoutCompleteEvent { layout = p.layout };
+                        var layout_event = new LayoutCompleteEvent { Layout = p.layout };
                         manager.Events.Trigger(layout_event);
                     }
                 }
