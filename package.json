@@ -1,6 +1,6 @@
 {
   "name": "unity-n-layout",
-  "version": "0.0.2",
+  "version": "1.0.0",
   "description": "A worldspace layout management package",
   "main": "index.js",
   "repository": {
