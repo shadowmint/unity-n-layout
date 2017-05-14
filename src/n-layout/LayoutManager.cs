@@ -5,73 +5,65 @@ using UnityEngine;
 
 namespace N.Package.Layout
 {
-    /// A manager type to look after layouts
-    public abstract class LayoutManagerBase<TStream>
+  /// A manager type to look after layouts
+  public abstract class LayoutManagerBase<TStream>
+  {
+    /// The animation manager we're using
+    private readonly AnimationManagerBase<TStream> _manager;
+
+    /// Pending layouts
+    private readonly List<LayoutPending> _pending = new List<LayoutPending>();
+
+    /// Create a new layout manager
+    /// @param manager The IAnimationManager to animate with
+    protected LayoutManagerBase(AnimationManagerBase<TStream> manager)
     {
-        /// The animation manager we're using
-        private AnimationManagerBase<TStream> manager;
-
-        /// Pending layouts
-        private List<LayoutPending> pending = new List<LayoutPending>();
-
-        /// Create a new layout manager
-        /// @param manager The IAnimationManager to animate with
-        public LayoutManagerBase(AnimationManagerBase<TStream> manager)
+      _manager = manager;
+      _manager.Events.AddEventHandler<AnimationCompleteEvent>((ep) =>
+      {
+        foreach (var p in _pending)
         {
-            this.manager = manager;
-            this.manager.Events.AddEventHandler<AnimationCompleteEvent>((ep) =>
-            {
-                foreach (var p in pending)
-                {
-                    if (p.Resolve(ep.animation))
-                    {
-                        var layout_event = new LayoutCompleteEvent { Layout = p.layout };
-                        manager.Events.Trigger(layout_event);
-                    }
-                }
-                pending.RemoveAll((p) => p.Pending == 0);
-            });
+          if (!p.Resolve(ep.Animation)) continue;
+          var layoutEvent = new LayoutCompleteEvent {Layout = p.Layout};
+          manager.Events.Trigger(layoutEvent);
         }
-
-        /// Apply a layout to a specific target
-        public void Add(TStream stream, ILayout layout, LayoutFactoryDelegate factory, IAnimationTarget target)
-        {
-            var anims = new List<IAnimation>();
-            foreach (var lp in layout.Layout(target))
-            {
-                var animation = factory(lp);
-                manager.Streams.Add(stream, animation);
-                anims.Add(animation);
-            }
-            pending.Add(new LayoutPending(anims.ToArray(), layout));
-        }
+        _pending.RemoveAll((p) => p.Pending == 0);
+      });
     }
 
-    public class LayoutManager : LayoutManagerBase<Streams>
+    /// Apply a layout to a specific target
+    public void Add(TStream stream, ILayout layout, LayoutFactoryDelegate factory, IAnimationTarget target)
     {
-        /// Create a new instance
-        public LayoutManager(AnimationManagerBase<Streams> manager) : base(manager)
-        {
-        }
-
-        /// Returns The default LayoutManager
-        private static LayoutManager instance = null;
-        public static LayoutManager Default
-        {
-            get
-            {
-                if (instance == null)
-                {
-                    instance = new LayoutManager(AnimationManager.Default);
-                }
-                return instance;
-            }
-        }
-
-        /// Reset the layout manager
-        public static void Reset()
-        {
-            instance = null;
-        }
+      var anims = new List<IAnimation>();
+      foreach (var lp in layout.Layout(target))
+      {
+        var animation = factory(lp);
+        _manager.Streams.Add(stream, animation);
+        anims.Add(animation);
+      }
+      _pending.Add(new LayoutPending(anims.ToArray(), layout));
     }
+  }
+
+  public class LayoutManager : LayoutManagerBase<Streams>
+  {
+    /// Create a new instance
+    public LayoutManager(AnimationManagerBase<Streams> manager) : base(manager)
+    {
+    }
+
+    /// Returns The default LayoutManager
+    private static LayoutManager instance = null;
+
+    public static LayoutManager Default
+    {
+      get { return instance ?? (instance = new LayoutManager(AnimationManager.Default)); }
+    }
+
+    /// Reset the layout manager
+    public static void Reset()
+    {
+      instance = null;
+    }
+  }
 }

@@ -6,86 +6,86 @@ using N;
 
 namespace N.Package.Layout.Layouts
 {
-    public class LinearPlanarSpread : ILayout
+  public class LinearPlanarSpread : ILayout
+  {
+    /// The origin
+    public Vector3 Origin;
+
+    /// The rotation for the plane
+    public Quaternion Rotation;
+
+    /// Up vector
+    public Vector3 Up;
+
+    /// Left vector
+    public Vector3 Left;
+
+    /// The width of the layout
+    public float Width;
+
+    /// The height of the layout
+    public float Height;
+
+    public LinearPlanarSpread(GameObject alignToTarget)
     {
-        /// The origin
-        public Vector3 origin;
-
-        /// The rotation for the plane
-        public Quaternion rotation;
-
-        /// Up vector
-        public Vector3 up;
-
-        /// Left vector
-        public Vector3 left;
-
-        /// The width of the layout
-        public float width;
-
-        /// The height of the layout
-        public float height;
-
-        public LinearPlanarSpread(GameObject alignToTarget)
+      this.Origin = alignToTarget.transform.position;
+      this.Rotation = alignToTarget.transform.rotation;
+      var renderer = alignToTarget.GetComponent<Renderer>();
+      Up = alignToTarget.transform.forward.normalized;
+      Left = -alignToTarget.transform.right.normalized;
+      if (renderer != null)
+      {
+        GuessSize(renderer.bounds.size);
+      }
+      else
+      {
+        var collider = alignToTarget.GetComponent<Collider>();
+        if (collider != null)
         {
-            this.origin = alignToTarget.transform.position;
-            this.rotation = alignToTarget.transform.rotation;
-            var renderer = alignToTarget.GetComponent<Renderer>();
-            up = alignToTarget.transform.forward.normalized;
-            left = -alignToTarget.transform.right.normalized;
-            if (renderer != null)
-            {
-                GuessSize(renderer.bounds.size);
-            }
-            else
-            {
-                var collider = alignToTarget.GetComponent<Collider>();
-                if (collider != null)
-                {
-                    GuessSize(collider.bounds.size);
-                }
-                else
-                {
-                    width = 1f;
-                    height = 1;
-                }
-            }
+          GuessSize(collider.bounds.size);
         }
-
-        /// Yield a set of locations and orientations for each target
-        public IEnumerable<LayoutObject> Layout(IAnimationTarget target)
+        else
         {
-            var count = target.GameObjects().Count();
-            var origin_x = -width / 2f * left;
-            var interval_x = width / (count - 1) * left;  // Number of gaps, not objects
-            var offset = 0;
-            foreach (var gp in target.GameObjects())
-            {
-                var pos_x = origin_x + offset * interval_x;
-                var pos = this.origin + pos_x;
-                offset += 1;
-                yield return new LayoutObject
-                {
-                    gameObject = gp,
-                    rotation = this.rotation,
-                    position = pos
-                };
-            }
+          Width = 1f;
+          Height = 1;
         }
-
-        /// Calculate the x and y size from a bounds object
-        private void GuessSize(Vector3 bounds)
-        {
-            width = bounds.x;
-            height = bounds.y;
-            if (bounds.z > width)
-            {
-                width = bounds.z;
-            }
-            else if (bounds.z > height)
-            {
-                height = bounds.z;
-            }
-        }
+      }
     }
+
+    /// Yield a set of locations and orientations for each target
+    public IEnumerable<LayoutObject> Layout(IAnimationTarget target)
+    {
+      var count = target.GameObjects().Count();
+      var originX = -Width / 2f * Left;
+      var intervalX = Width / (count - 1) * Left; // Number of gaps, not objects
+      var offset = 0;
+      foreach (var gp in target.GameObjects())
+      {
+        var posX = originX + offset * intervalX;
+        var pos = Origin + posX;
+        offset += 1;
+        yield return new LayoutObject
+        {
+          GameObject = gp,
+          Rotation = Rotation,
+          Position = pos
+        };
+      }
+    }
+
+    /// Calculate the x and y size from a bounds object
+    private void GuessSize(Vector3 bounds)
+    {
+      Width = bounds.x;
+      Height = bounds.y;
+      if (bounds.z > Width)
+      {
+        Width = bounds.z;
+      }
+      else if (bounds.z > Height)
+      {
+        Height = bounds.z;
+      }
+    }
+  }
 }
